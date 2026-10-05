@@ -155,3 +155,26 @@ assert n_dates >= 7, (
 # - [ ] Silver has fewer rows than Bronze (dedup worked)
 # - [ ] Gold spans ≥ 7 dates × 3 models (slide §8 medallion contract)
 # - [ ] Cost & error_rate columns populated and non-zero
+
+# %% [markdown]
+# ## Validate the full Gold contract
+#
+# The rubric also requires ordered latency percentiles, positive illustrative
+# cost, and an error rate within [0, 1]. Keep these as explicit assertions so
+# the notebook fails if a future change breaks the reported Gold metrics.
+
+# %%
+tables_exist = all(Path(p).exists() for p in (BRONZE, SILVER, GOLD))
+quality_checks = {
+    "Bronze, Silver, Gold exist on storage": tables_exist,
+    "Silver rows < Bronze rows": silver_n < bronze_n,
+    "Gold spans at least 7 dates": n_dates >= 7,
+    "Gold covers 3 models": n_models == 3,
+    "p50 latency <= p95 latency": bool((gold_df["p50_latency_ms"] <= gold_df["p95_latency_ms"]).all()),
+    "cost_usd is positive": bool((gold_df["cost_usd"] > 0).all()),
+    "error_rate is within [0, 1]": bool(((gold_df["error_rate"] >= 0) & (gold_df["error_rate"] <= 1)).all()),
+}
+for check, passed in quality_checks.items():
+    print(f"  [{'PASS' if passed else 'FAIL'}] {check}")
+assert all(quality_checks.values()), "Medallion Gold contract failed — inspect the checks above"
+print("\nNB4 complete.")

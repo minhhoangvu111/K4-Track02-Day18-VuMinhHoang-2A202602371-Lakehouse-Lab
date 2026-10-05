@@ -31,7 +31,7 @@ import pyarrow as pa
 
 from lakehouse import catalog, count_files, du, human, namespace, reset_catalog
 
-CAT = "nb5"          # own catalog dir: NB6/NB8/`make smoke` cannot disturb it
+CAT = "nb5_submission"  # dedicated scratch catalog; preserves any earlier nb5 run
 reset_catalog(CAT)   # idempotent rerun
 cat = catalog(CAT)
 ns = namespace(cat, "lake")

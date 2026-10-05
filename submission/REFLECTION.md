@@ -1,0 +1,3 @@
+# Reflection — Small-file accumulation
+
+Anti-pattern tôi chọn là để các file nhỏ tích tụ trong pipeline observability của LLM. Luồng request thường ghi theo micro-batch liên tục; mỗi lần ghi nhỏ đều hợp lệ, nhưng hàng nghìn file làm tăng số lần đọc metadata, chi phí GET và thời gian lập kế hoạch truy vấn. NB6 cho thấy 200 micro-batch tạo 200 file; compaction giảm còn 11 file, còn clustering giúp bỏ qua 90% file trong point query. Tôi sẽ gom file theo ngưỡng kích thước/thời gian, chạy maintenance có lịch, theo dõi file count và độ phân tán min/max, đồng thời chọn retention phù hợp để không ảnh hưởng reader đang chạy.
